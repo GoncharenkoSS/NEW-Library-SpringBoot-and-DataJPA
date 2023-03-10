@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>BOOKS</title>
+</head>
+<body>
+<style th:inline="css">
+    .title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+        color: #fff;
+        font-size: 1.8rem;
+        background: #00008b;
+    }
+    .per {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #00008b;
+        font-size: 1.2rem;
+    }
+    .boo{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        height: auto;
+        background: #b67f10;
+    }
+</style>
+<h2 class="title">Book</h2>
+
+<a class="per" th:text="${'Name - ' + book.getName() + '.'}">Value</a><br/>
+<a class="per" th:text="${'Author - ' + book.getAuthor() + '.'}">Value</a><br/>
+<a class="per" th:text="${'Year - ' + book.getYear() + '.'}">Value</a>
+<br/>
+<div class="boo" th:if="${owner}">
+    <span>Book now possession: </span> <span th:text="${owner.getName()}">Name</span>
+    <form th:method="PATCH" th:action="@{/book/{id}/release(id=${book.getId()})}">
+        <input type="submit" value="Release book">
+    </form>
+</div>
+<hr/>
+
+<div class="boo" th:if="${people}">
+<span>This book is free, to whom should I assign it?</span>
+<form th:method="PATCH" th:action="@{/book/{id}/assign(id=${book.getId()})}">
+           <label for="person">Choose a person:</label>
+           <select th:object="${person}" th:field="*{id}" id="person">
+                   <option th:each="person : ${people}" th:value="${person.getId()}" th:text="${person.getName()}">
+                   </option>
+           </select>
+    <input type="submit" value="Assign book!">
+</form>
+</div>
+
+<br/>
+<hr/>
+<div class="title">
+    <form  th:action="@{/book}">
+        <button>Back to book list</button>
+    </form>
+<form th:action="@{/book/{id}/edit(id=${book.getId()})}">
+    <button>Edit book</button>
+</form>
+<b></b>
+<form  th:method="DELETE" th:action="@{/book/{id}(id=${book.getId()})}">
+    <button>Delete book</button>
+</form>
+</div>
+
+</body>
+</html>

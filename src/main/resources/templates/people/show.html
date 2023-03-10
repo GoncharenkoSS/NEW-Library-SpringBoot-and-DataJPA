@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PERSON</title>
+</head>
+<body>
+<style th:inline="css">
+.title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    color: #fff;
+    font-size: 1.8rem;
+    background: #00008b;
+}
+.per {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     color: #00008b;
+     font-size: 1.2rem;
+ }
+.boo{
+    justify-content: center;
+    font-size: 1rem;
+    height: auto;
+    background: #b67f10;
+}
+.p{
+    font-size: 30px;
+}
+</style>
+
+<h1 class="title">Person</h1>
+<a class="per" th:text="${'Name - ' + person.getName() + '.'}">Value</a><br/>
+<a class="per" th:text="${'Year of birth - ' + person.getYear() + '.'}">Value</a><br/>`
+
+<div th:if="${book.isEmpty()}">
+    <p>Person don't take no one book</p>
+    <hr/>
+</div>
+
+<div th:if="${!book.isEmpty()}">
+    <hr/>
+
+    <p><img src="https://klike.net/uploads/posts/2021-10/1635141742_1.jpg"
+            alt="Image here" width="50" height="50"><b class="p">Books: </b></p>
+
+
+<div class="boo">
+    <table th:each="books : ${book}">
+        <tr th:text="${books.getName() + ' / ' + books.getAuthor() + ' / ' + books.getYear()}">book</tr>
+    </table>
+</div>
+
+<hr/>
+
+</div>
+<div class="title">
+<form  th:action="@{/people/{id}/edit(id=${person.getId()})}">
+    <button>Edit person</button>
+</form>
+<b></b>
+<form  th:method="DELETE" th:action="@{/people/{id}(id=${person.getId()})}">
+    <button>Delete person</button>
+</form>
+</div>
+
+</body>
+</html>
