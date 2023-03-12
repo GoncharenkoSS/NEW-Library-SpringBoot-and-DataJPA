@@ -1,6 +1,8 @@
 package ru.mrSergey.SpringBoot.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mrSergey.SpringBoot.models.Book;
@@ -21,8 +23,9 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public List<Book> findAll(){
-        return bookRepository.findAll();
+    public List<Book> findAll(int pageNumber, int quantityString){
+        return bookRepository.findAll(PageRequest.of(pageNumber,
+                quantityString, Sort.by("name"))).getContent();
     }
 
     public Book findOne(int id){
@@ -46,4 +49,21 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
+    @Transactional
+    public void assign(int id,Person select) {
+        bookRepository.findById(id).ifPresent(book -> book.setOwner(select));
+    }
+    @Transactional
+    public void release(int id) {
+        bookRepository.findById(id).ifPresent(book -> book.setOwner(null));
+    }
+
+    public Optional<Person> getBookOwner(int id){
+       return bookRepository.findById(id).map(Book::getOwner);
+    }
+
+    public List<Book> search(String query){
+        query = query.substring(0, 1).toUpperCase() + query.substring(1);
+        return bookRepository.findBookByNameStartingWith(query);
+    }
 }

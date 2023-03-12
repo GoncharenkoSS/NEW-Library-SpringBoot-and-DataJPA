@@ -17,6 +17,10 @@
 </style>
 <h1 class="title">List books name</h1>
 <br/>
+<form th:method="GET" th:action="@{/book/search}">
+    <button>Search book</button>
+</form>
+<br/>
 <div  th:each="bb : ${book}">
     <a><img src="https://klike.net/uploads/posts/2021-10/1635141742_1.jpg"
             alt="Image here" width="30" height="30"></a><a th:href="@{/book/{id}(id=${bb.getId()})}"

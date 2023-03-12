@@ -2,13 +2,15 @@ package ru.mrSergey.SpringBoot.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mrSergey.SpringBoot.DAO.BookDAO;
 import ru.mrSergey.SpringBoot.models.Book;
 import ru.mrSergey.SpringBoot.models.Person;
+import ru.mrSergey.SpringBoot.repositories.BookRepository;
 import ru.mrSergey.SpringBoot.services.BookService;
 import ru.mrSergey.SpringBoot.services.PeopleService;
 
@@ -18,33 +20,38 @@ import java.util.Optional;
 @RequestMapping("/book")
 public class BookController {
 
-    private final BookDAO bookDAO;
     private final BookService bookService;
     private final PeopleService peopleService;
+    private final BookRepository bookRepository;
 
     @Autowired
-    public BookController(BookDAO bookDAO, BookService bookService, PeopleService peopleService) {
-        this.bookDAO = bookDAO;
+    public BookController(BookService bookService, PeopleService peopleService, BookRepository bookRepository) {
         this.bookService = bookService;
         this.peopleService = peopleService;
+        this.bookRepository = bookRepository;
     }
+
     @GetMapping()
-    public String index(Model model){
-        model.addAttribute("book", bookService.findAll());
+    public String index(Model model,
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+          @RequestParam(name = "quantityString", required = false, defaultValue = "100") int quantityString){
+          model.addAttribute("book", bookService.findAll(pageNumber, quantityString));
         return  "book/index";
     }
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model, @ModelAttribute("person") Person person){
         model.addAttribute("book", bookService.findOne(id));
-        Optional<Person> bookOwner = bookDAO.getBookOwner(id);
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        Optional<Person> bookOwner = bookService.getBookOwner(id);
         if(bookOwner.isPresent())
             model.addAttribute("owner", bookOwner.get());
         else
             model.addAttribute("people", peopleService.findAll());
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         return  "book/show";
     }
     @GetMapping("/new")
-    public String newPerson(@ModelAttribute("book") Book book){
+    public String newBook(@ModelAttribute("book") Book book){
         return "book/new";
     }
 
@@ -80,13 +87,24 @@ public class BookController {
 
     @PatchMapping("/{id}/release")
     public String release(@PathVariable("id") int id){
-        bookDAO.release(id);
+        bookService.release(id);
         return "redirect:/book/" + id;
     }
 
     @PatchMapping("/{id}/assign")
-    public String assign(@PathVariable("id") int id, @ModelAttribute("person") Person select){
-        bookDAO.assign(id, select);
+    public String assign(@PathVariable("id") int id, @ModelAttribute("person") Person select) {
+        bookService.assign(id, select);
         return "redirect:/book/" + id;
+    }
+
+    @GetMapping("/search")
+    public String searchPage(){
+        return "book/search";
+    }
+
+    @PostMapping("/search")
+    public String makeSearch(Model model, @RequestParam("query") String query){
+        model.addAttribute("books", bookService.search(query));
+        return "book/search";
     }
 }

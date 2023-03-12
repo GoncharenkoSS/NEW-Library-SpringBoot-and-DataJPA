@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mrSergey.SpringBoot.DAO.PersonDAO;
 import ru.mrSergey.SpringBoot.models.Person;
 import ru.mrSergey.SpringBoot.services.PeopleService;
 
@@ -16,11 +15,10 @@ import ru.mrSergey.SpringBoot.services.PeopleService;
 public class PeopleController {
 
     private final PeopleService peopleService;
-    private final PersonDAO personDAO;
+
     @Autowired
-    public PeopleController(PeopleService peopleService, PersonDAO personDAO) {
+    public PeopleController(PeopleService peopleService) {
         this.peopleService = peopleService;
-        this.personDAO = personDAO;
     }
 
     @GetMapping()
@@ -32,7 +30,7 @@ public class PeopleController {
     @GetMapping("/{id}")
     public String show(@PathVariable int id, Model model){
         model.addAttribute("person", peopleService.findOne(id));
-        model.addAttribute("book", personDAO.getBookByPersonId(id));
+        model.addAttribute("book", peopleService.getBookByPersonId(id));
         return  "people/show";
     }
     @GetMapping("/new")
